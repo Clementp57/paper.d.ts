@@ -1,0 +1,926 @@
+are module paper {
+
+    export function setup(canvas: HTMLCanvasElement): void;
+
+    export interface KeyModifiers {
+
+        //#region Fields
+        shift: boolean;
+        control: boolean;
+        option: boolean;
+        command: boolean;
+        capsLock: boolean;
+        //#endregion
+        
+    }
+
+    export class PaperScope {
+
+        //#region Fields
+        version: number;
+        project: Project;
+        projects: Project[];
+        view: View;
+        views: View[];
+        tool: Tool;
+        tools: Tool[];
+        //#endregion
+
+        //#region Constructors
+        constructor();
+        //#endregion
+
+        //#region Public Methods
+        install(scope: any);
+        setup(canvas: HTMLCanvasElement);
+        clear();
+        remove();
+        //#endregion
+
+        //#region Static Methods
+        static get (id: string): PaperScope;
+        static each(iter: () => any);
+        //#endregion
+
+    }
+
+    export class PaperScript {
+
+        //#region Static Methods
+        static compile(code: string): string;
+        static evaluate(code: string, scope: PaperScope): {};
+        //#endregion
+                
+    }
+
+    export class Point {
+
+        //#region Fields
+        x: number;
+        y: number;
+        length: number;
+        angle: number;
+        angleInRadians: number;
+        quadrant: number;
+        selected: boolean;
+        //#endregion
+
+        //#region Constructors
+        constructor(x: number, y: number);
+        constructor(values: any[]);
+        constructor(object: {});
+        constructor(size: Size);
+        constructor(point: Point);
+        //#endregion
+        
+        //#region Operators
+        add(point: Point): Point;
+        add(x: number, y: number): Point;
+        add(value: number): Point;
+
+        subtract(point: Point): Point;
+        subtract(x: number, y: number): Point;
+        subtract(value: number): Point;
+
+        negate(): Point;
+            
+        multiply(point: Point): Point;
+        multiply(x: number, y: number): Point;
+        multiply(value: number): Point;
+
+        divide(point: Point): Point;
+        divide(x: number, y: number): Point;
+        divide(value: number): Point;
+        //#endregion
+
+        //#region Public Methods
+        clone(): Point;
+        toString(): string;
+        transform(matrix: Matrix): Point;
+
+        getDistance(point: Point, squared: boolean): number;
+        normalize(length?: number);
+
+        getAngle(): number;
+        getAngleInRadians(): number;
+        getDirectedAngle(point: Point): number;
+        rotate(angle: number, center: Point): Point;
+
+        isInside(rect: Rectangle): boolean;
+        isClose(point: Point, tolerance: number): boolean;
+        isColinear(point: Point): boolean;
+        isOrthogonal(point: Point): boolean;
+        isZero(): boolean;
+        isNan(): boolean;
+
+        dot(point: Point): number;
+        cross(point: Point): number;
+        project(point: Point): Point;
+        //#endregion
+                                                          
+        //#region Static Methods
+        static min(point1: Point, point2: Point): Point;
+        static max(point1: Point, point2: Point): Point;
+        //#endregion
+                     
+    }
+
+    export class Size {
+
+        //#region Fields
+        width: number;
+        height: number;
+        //#endregion
+        
+        //#region Public Methods
+        toString(): string;
+        clone(): Size;
+
+        isZero(): boolean;
+        isNan(): boolean;
+
+        round(): Size;
+        ceil(): Size;
+        floor(): Size;
+        abs(): Size;
+        //#endregion
+
+        //#region Static Methods
+        static min(size1: Size, size2: Size): Size;
+        static max(size1: Size, size2: Size): Size;
+        static random(): Size;
+        //#endregion
+       
+    }
+
+    export class Rectangle {
+
+        //#region Fields
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        point: Point;
+        size: Size;
+        left: number;
+        top: number;
+        right: number;
+        bottom: number;
+        center: Point;
+        topLeft: Point;
+        topRight: Point;
+        bottomLeft: Point;
+        bottomRight: Point;
+        leftCenter: Point;
+        topCenter: Point;
+        rightCenter: Point;
+        bottomCenter: Point;
+        //#endregion
+
+        //#region Constructors
+        constructor(point: Point, size: Size);
+        constructor(x: number, y: number, width: number, height: number);
+        constructor(point1: Point, point2: Point);
+        constructor(rect: Rectangle);
+        //#endregion
+
+        //#region Public Methods
+        isEmpty(): boolean;
+        toString(): string;
+        contains(point: Point): boolean;
+        contains(rect: Rectangle): boolean;
+        intersects(rect: Rectangle): boolean;
+        intersect(rect: Rectangle): Rectangle;
+        unite(rect: Rectangle): Rectangle;
+        include(point: Point);
+        //#endregion
+
+    }
+
+    export class Matrix {
+
+        //#region Fields
+        scaleX: number;
+        scaleY: number;
+        shearX: number;
+        shearY: number;
+        translateX: number;
+        translateY: number;
+        values: number[];
+        rotation: number;
+        //#endregion
+
+        //#region Constructors
+        constructor(a: number, c: number, b: number, d: number, tx: number, ty: number);
+        //#endregion
+
+        a: number; c: number; b: number; d: number; tx: number; ty: number;
+
+        //#region Public Methods
+        clone(): Matrix;
+        set (a: number, c: number, b: number, d: number, tx: number, ty: number): Matrix;
+        scale(scale: number, center?: Point): Matrix;
+        scale(hor: number, ver: number, center?: Point): Matrix;
+        translate(point: Point): Matrix;
+        translate(dx: number, dy: number): Matrix;
+        rotate(angle: number): Matrix;
+        rotate(angle: number, center: Point): Matrix;
+        rotate(angle: number, x: number, y: number): Matrix;
+        shear(point: Point, center?: Point): Matrix;
+        shear(hor: number, ver: number, center?: Point): Matrix;
+        toString(): string;
+        concatenate(mx: Matrix): Matrix;
+        preConcatenate(mx: Matrix): Matrix;
+        transform(point: Point): Point;
+        transform(x: number, y: number): Point;
+        transform(src: number[], srcOff: number, dst: number[], dstOff: number, numPts: number): number[];
+        inverseTransform(point: Point): Point;
+        inverseTransform(x: number, y: number): Point;
+        isIdentity(): boolean;
+        isInvertible(): boolean;
+        isSingular(): boolean;
+        inversed(): Matrix;
+        setToScale(hor: number, ver: number): Matrix;
+        setToTranslation(dx: number, dy: number): Matrix;
+        setToShear(hor: number, ver: number): Matrix;
+        setToRotation(angle: number, x: number, y: number): Matrix;
+        applyToContext(ctx: any, reset?: boolean);
+        //#endregion
+
+        //#region Static Methods
+        static getScaleInstance(hor: number, ver: number): Matrix;
+        static getTranslateInstance(dx: number, dy: number): Matrix;
+        static getShearInstance(hor: number, ver: number, center: Point): Matrix;
+        static getRotateInstance(angle: number, x: number, y: number): Matrix;
+        //#endregion
+    
+    }
+
+    export class Item {
+
+        //#region Fields
+        id: number;
+        name: string;
+        position: Point;
+        style: PathStyle;
+        visible: boolean;
+        blendMode: string;
+        opacity: number;
+        guide: number;
+        selected: boolean;
+        clipMask: boolean;
+
+        project: Project;
+        layer: Layer;
+        parent: Item;
+        children: Item[];
+        firstChild: Item;
+        lastChild: Item;
+        nextSibling: Item;
+        previousSibling: Item;
+        index: number;
+
+        bounds: Rectangle;
+        strokeBounds: Rectangle;
+        handleBounds: Rectangle;
+
+        strokeColor: any;
+        strokeWidth: number;
+        strokeCap: string;
+        strokeJoin: string;
+        dashOffset: number;
+        dashArray: number[];
+        miterLimit: number;
+
+        fillColor: Color;
+        //#endregion
+       
+        //#region Public Methods
+        addChild(item: Item);
+        insertChild(index, item: Item);
+        addChildren(items: Item[]);
+        insertChildren(index, items: Item[]);
+        insertAbove(item: Item): boolean;
+        insertBelow(item: Item): boolean;
+        remove(): boolean;
+        removeChildren(): Item[];
+        removeChildren(from: number, to?: number): Item[];
+        reverseChildren();
+
+        hasChildren(): boolean;
+        isAbove(item: Item): boolean;
+        isBelow(item: Item): boolean;
+        isParent(item: Item): boolean;
+        isChild(item: Item): boolean;
+        isDescendant(item: Item): boolean;
+        isAncestor(item: Item): boolean;
+        isGroupedWith(item: Item): boolean;
+
+        scale(scale: number, center: Point);
+        scale(hor: number, ver: number, center?: Point);
+        translate(delta: number);
+        rotate(angle: number, center: Point);
+        shear(point: Point, center: Point);
+        shear(hor: number, ver: number, center: Point);
+        transform(matrix: Matrix, flags?: any[]);
+        fitBounds(rectangle: Rectangle, fill?: boolean);
+
+        removeOn(object: {});
+        removeOnMove();
+        removeOnDown();
+        removeOnDrag();
+        removeOnUp();
+        //#endregion
+
+    }
+
+    export class Group extends Item {
+
+        //#region Fields
+        clipped: boolean;
+        //#endregion
+
+        //#region Constructors
+        constructor(children: Item[]);
+        //#endregion
+
+    }
+
+    export class Layer extends Group {
+
+        //#region Constructors
+        constructor();
+        constructor(children: Item[]);
+        //#endregion
+              
+        //#region Public Methods
+        activate();
+        //#endregion
+ 
+    }
+
+    export class PlacedItem extends Item {
+
+        //#region Fields
+        matrix: Matrix;
+        //#endregion
+
+    }
+
+    export class Raster extends PlacedItem {
+
+        //#region Fields
+        size: Size;
+        width: number;
+        height: number;
+        ppi: number;
+        context: {};
+        image: HTMLImageElement;
+        //#endregion
+
+        //#region Constructors
+        constructor(imageId: string);
+        //#endregion
+   
+        //#region Public Methods
+        getSubImage(rect: Rectangle): HTMLCanvasElement;
+        drawImage(image: HTMLImageElement, point: Point);
+        drawImage(image: HTMLCanvasElement, point: Point);
+        getAverageColor(path: Path): Color;
+        getAverageColor(rect: Rectangle): Color;
+        getAverageColor(point: Point): Color;
+
+
+        getPixel(x: number, y: number): RgbColor;
+        getPixel(point: Point): RgbColor;
+        setPixel(x: number, y: number, color: Color);
+        setPixel(point: Point, color: Color);
+
+        createData(size: Size): {};
+        getData(rect: Rectangle): {};
+        setData(data: {}, point: Point): {};
+        //#endregion
+
+    }
+
+    export class PlacedSymbol extends PlacedItem {
+
+        //#region Fields
+        symbol: Symbol;
+        //#endregion
+
+        //#region Constructors
+        constructor(symbol: Symbol, matrix?: Matrix);
+        constructor(symbol: Symbol, point?: Point);
+        //#endregion
+
+    }
+
+    export class HitResult {
+
+        //#region Fields
+        type: string;
+        name: string;
+        item: Item;
+        location: CurveLocation;
+        segment: Segment;
+        point: Point;
+        //#endregion
+
+    }
+
+    export class PathItem extends Item {
+
+        //#region Public Methods
+        smooth();
+
+        moveTo(point: Point);
+        moveTo(x: number, y: number);
+        lineTo(point: Point);
+        lineTo(x: number, y: number);
+        cubicCurveTo(handle1: Point, handle2: Point, to: Point);
+        quadraticCurveTo(handle: Point, to: Point);
+        curveTo(through: Point, to: Point, parameter?: any);
+        arcTo(through: Point, to: Point);
+        arcTo(to: Point, clockwise?: boolean);
+        closePath();
+
+        moveBy(point: Point);
+        moveBy(x: number, y: number);
+        lineBy(vector: Point);
+        lineBy(x: number, y: number);
+        curveBy(throughVector: Point, toVector: Point, parameter?: any);
+        arcBy(throughVector: Point, toVector: Point);
+        //#endregion
+
+    }
+
+    export class Path extends PathItem {
+
+        //#region Fields
+        segments: Segment[];
+        firstSegment: Segment;
+        lastSegment: Segment;
+        curves: Curve[];
+        firstCurve: Curve;
+        lastCurve: Curve;
+        closed: boolean;
+        fullySelected: boolean;
+        clockwise: boolean;
+        length: number;
+        //#endregion
+
+        //#region Constructors
+        constructor();
+        constructor(segments: Segment[]);
+        //#endregion
+
+        //#region Public Methods
+        add(segment: Segment): Segment;
+        insert(index: number, segment: Segment): Segment;
+        addSegments(segments: Segment[]): Segment[];
+        insertSegments(index: number, segments: Segment[]): Segment[];
+        removeSegment(index: number): Segment;
+        removeSegments(): Segment[];
+        removeSegments(from: number, to?: number): Segment[];
+        flatten(maxDistance: number);
+        simplify(tolerance?: number);
+        reverse();
+        join(path: Path);
+
+        getLocationAt(offset: number, isParameter?: boolean): CurveLocation;
+        getPointAt(offset: number, isParameter?: boolean): Point;
+        getTangentAt(offset: number, isParameter?: boolean): Point;
+        getNormalAt(offset: number, isParameter?: boolean): Point;
+        getNearestLocation(point: Point): CurveLocation;
+        getNearestPoint(point: Point): Point;
+        //#endregion
+
+        //#region Static Methods
+        static Line(pt1: Point, pt2: Point): Path;
+        static Rectangle(point: Point, size): Path;
+        static Rectangle(point1: Point, point2: Point): Path;
+        static Rectangle(rect: Rectangle): Path;
+        static RoundRectangle(rect: Rectangle, size: Size): Path;
+        static Oval(rect: Rectangle, circumscribed?: boolean): Path;
+        static Circle(center: Point, radius: number): Path;
+        static Arc(from: Point, through: Point, to: Point): Path;
+        static RegularPolygon(center: Point, numSides: number, radius: number): Path;
+        static Star(center: Point, numPoints: number, radius1: number, radius2: number): Path;
+        //#endregion
+        
+    }
+
+    export class CompoundPath extends PathItem {
+
+        //#region Fields
+        simplify();
+        //#endregion
+
+        //#region Constructors
+        constructor(paths: Path[]);
+        //#endregion
+
+    }
+
+    export class Segment {
+
+        //#region Fields
+        point: Point;
+        handleIn: Point;
+        handleOut: Point;
+        selected: boolean;
+
+        index: number;
+        path: Path;
+        curve: Curve;
+
+        next: Segment;
+        previous: Segment;
+        //#endregion
+
+        //#region Constructors
+        constructor(point?: Point, handleIn?: Point, handleOut?: Point);
+        //#endregion
+
+        //#region Public Methods
+        reverse(): Segment;
+        remove();
+        toString(): string;
+        //#endregion
+
+    }
+
+    export class SegmentPoint extends Point {
+
+        //#region Public Methods
+        set (x: number, y: number): SegmentPoint;
+        getX(): number;
+        setX(x: number);
+        getY(): number;
+        setY(y: number);
+        isZero(): boolean;
+        setSelected(selected: boolean);
+        isSelected(): boolean;
+        //#endregion
+
+    }
+
+    
+
+    export class Curve {
+
+        //#region Fields
+        point1: Point;
+        point2: Point;
+        handle1: Point;
+        handle2: Point;
+        segment1: Segment;
+        segment2: Segment;
+        path: Path;
+        index: number;
+        next: Curve;
+        previous: Curve;
+        selected: boolean;
+        length: number;
+        //#endregion
+
+        //#region Constructors
+        constructor(segment1: Segment, segment2: Segment);
+        //#endregion
+
+        //#region Public Methods
+        isLinear(): boolean;
+        getParameterAt(offset: number, start?: number): number;
+        getPoint(parameter: number): Point;
+        getTangent(parameter: number): Point;
+        getNormal(parameter: number): Point;
+        getParameter(point: Point): number;
+        reverse(): Curve;
+        clone(): Curve;
+        toString(): string;
+        //#endregion
+
+    }
+
+    export class PathStyle {
+
+        //#region Fields
+        strokeColor: any;
+        strokeWidth: number;
+        strokeCap: string;
+        strokeJoin: string;
+        dashOffset: number;
+        dashArray: number[];
+        miterLimit: number;
+        fillColor: Color;
+        //#endregion
+
+    }
+
+    export class CurveLocation {
+
+        //#region Fields
+        segment: Segment;
+        curve: Curve;
+        path: Path;
+        index: number;
+        offset: number;
+        curveOffset: number;
+        parameter: number;
+        point: Point;
+        tangent: Point;
+        normal: Point;
+        distance: number;
+        //#endregion
+
+        //#region Constructors
+        constructor(curve: Curve, parameter: number, point: Point, distance: number);
+        //#endregion
+
+        //#region Public Methods
+        toString(): string;
+        //#endregion
+
+    }
+
+    export class Project {
+
+        //#region Fields
+        currentStyle: PathStyle;
+        index: number;
+        selectedItems: Item[];
+
+        layers: Layer[];
+        activeLayer: Layer;
+        symbols: Symbol[];
+        views: View[];
+        activeView: View;
+        //#endregion
+
+        //#region Constructors
+        constructor();
+        //#endregion
+
+        //#region Public Methods
+        activate();
+        remove();
+        selectAll();
+        deselectAll();
+        hitTest(point: Point, options?: {}): HitResult;
+        //#endregion
+
+    }
+
+    export class Symbol {
+
+        //#region Fields
+        project: Project;
+        definition: Item;
+        //#endregion
+
+        //#region Constructors
+        constructor(item: Item);
+        //#endregion
+
+        //#region Public Methods
+        place(position?: Point): PlacedSymbol;
+        clone(): Symbol;
+        //#endregion
+
+    }
+
+    export class Color {
+
+        //#region Fields
+        type: string;
+        alpha: number;
+
+        red: number;
+        green: number;
+        blue: number;
+
+        gray: number;
+
+        hue: number;
+        saturation: number;
+        brightness: number;
+
+        lightness: number;
+        //#endregion
+       
+        //#region Public Methods
+        clone(): Color;
+        hasAlpha(): boolean;
+
+        toString(): string;
+        toCssString(): string;
+        //#endregion
+
+    }
+
+    export class GrayColor extends Color {
+        constructor(gray: number, alpha?: number);
+    }
+    export class RgbColor extends Color {
+        constructor(red: number, green: number, blue: number, alpha?: number);
+    }
+    export class HsbColor extends Color {
+        constructor(hue: number, saturation: number, brightness: number, alpha?: number);
+    }
+    export class HlsColor extends Color {
+        constructor(hue: number, saturation: number, lightness: number, alpha?: number);
+    }
+
+    export class GradientColor extends Color {
+
+        //#region Fields
+        origin: Point;
+        destination: Point;
+        hilite: boolean;
+        //#endregion
+
+        //#region Constructors
+        constructor(gradient: Gradient, origin: Point, destination: Point, hilight: boolean);
+        //#endregion
+
+        //#region Public Methods
+        clone(): GradientColor;
+        equals(color: GradientColor): boolean;
+        transform(matrix);
+        //#endregion
+
+    }
+
+    export class Gradient {
+
+        //#region Fields
+        stops: GradientStop[];
+        //#endregion
+
+        //#region Constructors
+        constructor(stops: GradientStop[], type?: string);
+        //#endregion
+
+        //#region Public Methods
+        clone(): Gradient;
+        //#endregion
+  
+    }
+
+    export class GradientStop {
+
+        //#region Fields
+        rampPoint: number;
+        color: Color;
+        //#endregion
+
+        //#region Constructors
+        constructor(color?: Color, rampPoint?: number);
+        //#endregion
+
+        //#region Public Methods
+        clone(): GradientStop;
+        //#endregion
+
+    }
+
+    export class View {
+
+        //#region Fields
+        canvas: HTMLCanvasElement;
+        viewSize: Size;
+        bounds: Rectangle;
+        size: Size;
+        center: Point;
+        zoom: number;
+        //#endregion
+
+        //#region Constructors
+        constructor(canvas: HTMLCanvasElement);
+        //#endregion
+
+        //#region Public Methods
+        activate();
+        remove();
+        isVisible(): boolean;
+        scrollBy(point: Point);
+        scrollBy(x: number, y: number);
+        setViewSize(width: number, height: number);
+        draw();
+        //#endregion
+
+        //#region Event Handlers
+        onFrame: (e: {}) => any;
+        onResize: (e: {}) => any;
+        //#endregion
+                
+    }
+
+    export class Tool {
+
+        //#region Fields
+        eventInterval: number;
+        minDistance: number;
+        maxDistance: number;
+        fixedDistance: number;
+        //#endregion
+
+        //#region Public Methods
+        activate();
+        remove();
+        //#endregion
+
+        //#region Event Handlers
+        onMouseDown: (e: ToolEvent) => void;
+        onMouseDrag: (e: ToolEvent) => void;
+        onMouseMove: (e: ToolEvent) => void;
+        onMouseUp: (e: ToolEvent) => void;
+        onKeyDown: (e: ToolEvent) => void;
+        onKeyUp: (e: ToolEvent) => void;
+        //#endregion
+
+    }
+
+    export class ToolEvent {
+
+        //#region Fields
+        type: string;
+        point: Point;
+        lastPoint: Point;
+        downPoint: Point;
+        middlePoint: Point;
+        delta: Point;
+        count: number;
+        item: Item;
+        //#endregion
+
+        //#region Public Methods
+        toString(): string;
+        //#endregion
+
+    }
+
+    export class Key {
+
+        //#region Static Methods
+        static isDown(key: string): boolean;
+        //#endregion
+        
+    }
+
+    export class KeyEvent {
+
+        //#region Fields
+        type: string;
+        character: string;
+        key: string;
+        //#endregion
+
+        //#region Public Methods
+        toString(): string;
+        //#endregion
+
+    }
+
+    export class TextItem extends Item {
+
+        //#region Fields
+        content: string;
+        characterStyle: CharacterStyle;
+        paragraphStyle: ParagraphStyle;
+        //#endregion
+        
+    }
+
+    export class PointText extends TextItem {
+
+        //#region Fields
+        point: Point;
+        //#endregion
+
+        //#region Constructors
+        constructor(point: Point);
+        //#endregion
+
+    }
+
+    export class CharacterStyle {
+
+        //#region Fields
+        font: string;
+        fontSize: number;
+        //#endregion
+
+    }
+
+    export class ParagraphStyle {
+
+        //#region Fields
+        justification: string;
+        //#endregion
+
+    }
+
+}
+

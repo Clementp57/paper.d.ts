@@ -1,4 +1,4 @@
-are module paper {
+module paper {
 
     export function setup(canvas: HTMLCanvasElement): void;
 
